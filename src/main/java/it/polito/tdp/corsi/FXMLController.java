@@ -5,8 +5,13 @@
 package it.polito.tdp.corsi;
 
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.corsi.model.Corso;
 import it.polito.tdp.corsi.model.Model;
+import it.polito.tdp.corsi.model.Studente;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -46,22 +51,106 @@ public class FXMLController {
 
     @FXML
     void corsiPerPeriodo(ActionEvent event) {
-    	
+    	txtRisultato.clear();
+    	String periodoString=txtPeriodo.getText();
+    	Integer periodo=0;
+    	try {
+    		periodo=Integer.parseInt(periodoString);
+    	}catch(NumberFormatException e) {
+    		txtRisultato.setText("devi inserire un numero");
+    		txtPeriodo.clear();
+    	}
+    	if(periodoString.length()==0) {
+    		txtRisultato.setText("devi inserire un periodo scolastico");
+    	}
+    	if(periodo!=1&&periodo!=2&&periodo!=0) {
+    		txtRisultato.setText("non esiste questo periodo scolastico");
+    		txtPeriodo.clear();
+    	}
+    	List<Corso>stampa=model.elencoCorsiPeriodo(periodo);
+    	for(Corso c:stampa) {
+    		txtRisultato.appendText(c.toString()+"\n");
+    		txtPeriodo.clear();
+    	}
+    
     }
 
     @FXML
     void numeroStudenti(ActionEvent event) {
+    	txtRisultato.clear();
+    	String periodoString=txtPeriodo.getText();
+    	Integer periodo=0;
+    	try {
+    		periodo=Integer.parseInt(periodoString);
+    	}catch(NumberFormatException e) {
+    		txtRisultato.setText("devi inserire un numero");
+    		txtPeriodo.clear();
+    	}
+    	if(periodoString.length()==0) {
+    		txtRisultato.setText("devi inserire un periodo scolastico");
+    	}
+    	if(periodo!=1&&periodo!=2&&periodo!=0) {
+    		txtRisultato.setText("non esiste questo periodo scolastico");
+    		txtPeriodo.clear();
+    	}
+    	Map<Corso,Integer>stampa=model.elencoCorsiPeriodoEStudenti(periodo);
+    	for(Corso s:stampa.keySet()) {
+    		Integer n=stampa.get(s);
+    		txtRisultato.appendText(s+" con iscritti:"+n+" studenti"+"\n");
+    		txtPeriodo.clear();
+    	}
     	
     }
 
     @FXML
     void stampaDivisione(ActionEvent event) {
+    	txtRisultato.clear();
+    	String corsoScelto=txtCorso.getText();
+    	if(corsoScelto.length()==0) {
+    		txtRisultato.setText("devi inserire un corso!!");
+    		return ;
+    	}
+    	if(model.esisteIlCorso(corsoScelto)==false) {
+    		txtRisultato.setText("il corso non esiste");
+    		txtCorso.clear();
+    		return ;
+    	}
+    	Map<String,Integer>stampa=model.totaleStudenti(corsoScelto);
+    	if(stampa.isEmpty()) {
+    		txtRisultato.setText("il corso non ha iscritti");
+    		txtCorso.clear();
+    		return ;
+    	}
+    	for(String s:stampa.keySet()) {
+    		Integer n=stampa.get(s);
+    		txtRisultato.appendText(s+" "+n+"\n");
+    		txtCorso.clear();
+    	}
 
     }
 
     @FXML
     void stampaStudenti(ActionEvent event) {
-
+    	txtRisultato.clear();
+    	String corsoScelto=txtCorso.getText();
+    	if(corsoScelto.length()==0) {
+    		txtRisultato.setText("devi inserire il codice di un corso!");
+    		return ;
+    	}
+    	if(model.esisteIlCorso(corsoScelto)==false) {
+    		txtRisultato.setText("il corso non esiste!!");
+    		txtCorso.clear();
+    		return ;
+    	}
+    	List <Studente>stampa=model.studentiDelCorso(corsoScelto);
+    	if(stampa.size()==0) {
+    		txtRisultato.setText("il corso non ha iscritti");
+    		txtCorso.clear();
+    		return ;
+    	}
+    	for(Studente s:stampa) {
+    	txtRisultato.appendText(s.toString()+"\n");
+    	txtCorso.clear();}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
